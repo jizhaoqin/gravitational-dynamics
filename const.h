@@ -1,4 +1,3 @@
-#pragma once
 // cgs units
 
 // Some useful constants

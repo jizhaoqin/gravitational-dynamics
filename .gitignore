@@ -1,3 +1,11 @@
 /data
-/figures
+**/figures
 a.out
+*.pdf
+*.dat
+*.ascii
+*.par
+*.png
+*.in
+*.txt
+*.sh

@@ -1,0 +1,33 @@
+#######################################################################
+#  Myprogram                                                          #
+#######################################################################
+
+# OPT += -DTMAX=200
+
+OPTIMIZE = -O2 -fopenmp
+
+# OPTIONS = $(OPTIMIZE) $(OPT)
+
+OPTIONS = $(OPTIMIZE)
+
+EXEC = myprogram
+
+OBJS = example.o
+
+INCL = ../../const.h ../../example.h Makefile
+
+CPPFLAGS = $(OPTIONS)
+
+CC = g++
+
+.cc.o:
+	$(CC) -c $(CPPFLAGS) -o "$@" "$<"
+
+$(EXEC): $(OBJS)
+	$(CC) $(OPTIONS) $(OBJS) -o $(EXEC)
+
+$(OBJS): $(INCL)
+
+clean:
+	rm -f $(OBJS)
+

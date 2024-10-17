@@ -1,85 +1,84 @@
-#pragma once
+#ifndef MYUTILS_HPP
+#define MYUTILS_HPP
 
-#include <math.h>
-#include <ostream>
+#include <cmath>
+#include <cstdio>
+#include <iostream>
 
-/* Vector class for working with vectors in three-dimensional space. */
-class vec {
-  public:
-    double comp[3]; // The components of the vector.
+class Vector3 {
+public:
+  double x, y, z;
 
-    // Define some standard ways of initializing,
-    // which allows us to write:
-    //   vec x(1,0,0);
+  // Default constructor
+  Vector3() : x(0), y(0), z(0) {}
 
-    vec() { comp[0] = comp[1] = comp[2] = 0; }
-    vec(double _x, double _y, double _z) {
-        comp[0] = _x;
-        comp[1] = _y;
-        comp[2] = _z;
+  // Constructor with initial values
+  Vector3(double x_, double y_, double z_) : x(x_), y(y_), z(z_) {}
+
+  // Copy constructor
+  Vector3(const Vector3 &other) : x(other.x), y(other.y), z(other.z) {}
+
+  // Print the vector
+  void print() const { printf("(%.4f, %.4f, %.4f)\n", x, y, z); }
+
+  // Assignment operator
+  Vector3 &operator=(const Vector3 &other) {
+    if (this != &other) {
+      x = other.x;
+      y = other.y;
+      z = other.z;
     }
+    return *this;
+  }
 
-    // Define some standard functions one would like to have for vectors,
-    // which allows to do:
-    //   double len=x.abs();
+  // Addition operator
+  Vector3 operator+(const Vector3 &other) const { return Vector3(x + other.x, y + other.y, z + other.z); }
 
-    double abs() { return (sqrt(comp[0] * comp[0] + comp[1] * comp[1] + comp[2] * comp[2])); }
-    double abs2() { return (comp[0] * comp[0] + comp[1] * comp[1] + comp[2] * comp[2]); }
-    double dot(const vec &_x) { return (comp[0] * _x.comp[0] + comp[1] * _x.comp[1] + comp[2] * _x.comp[2]); }
+  // Subtraction operator
+  Vector3 operator-(const Vector3 &other) const { return Vector3(x - other.x, y - other.y, z - other.z); }
 
-    // Cross product can be written as:
-    //   vec z=x.cross(y);
-    vec cross(const vec &_x) {
-        return (vec(comp[1] * _x.comp[2] - comp[2] * _x.comp[1], comp[2] * _x.comp[0] - comp[0] * _x.comp[2],
-                    comp[0] * _x.comp[1] - comp[1] * _x.comp[0]));
+  // Multiplication by scalar operator
+  Vector3 operator*(double scalar) const { return Vector3(x * scalar, y * scalar, z * scalar); }
+
+  // Division by scalar operator
+  Vector3 operator/(double scalar) const { return Vector3(x / scalar, y / scalar, z / scalar); }
+
+  // Dot product
+  double dot(const Vector3 &other) const { return x * other.x + y * other.y + z * other.z; }
+
+  // Cross product
+  Vector3 cross(const Vector3 &other) const {
+    return Vector3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
+  }
+
+  // Magnitude
+  double modulus() const { return sqrt(x * x + y * y + z * z); }
+  double modulusSquare() const { return x * x + y * y + z * z; }
+
+  // Normalize
+  Vector3 normalize() const {
+    double mag = modulus();
+    if (mag > 0) {
+      return *this / mag;
+    } else {
+      return Vector3();
     }
-
-    // Define some simple mathematical operators,
-    // which allows us to write things like:
-    //   vec y=x*3;
-    vec operator*(double _x) { return (vec(comp[0] * _x, comp[1] * _x, comp[2] * _x)); }
-    vec operator/(double _x) { return (vec(comp[0] / _x, comp[1] / _x, comp[2] / _x)); }
-    vec operator+(const vec &_x) { return (vec(comp[0] + _x.comp[0], comp[1] + _x.comp[1], comp[2] + _x.comp[2])); }
-    vec operator-(const vec &_x) { return (vec(comp[0] - _x.comp[0], comp[1] - _x.comp[1], comp[2] - _x.comp[2])); }
-    vec &operator+=(const vec &_x) {
-        this->comp[0] += _x.comp[0];
-        this->comp[1] += _x.comp[1];
-        this->comp[2] += _x.comp[2];
-        return *this;
-    }
-    vec &operator-=(const vec &_x) {
-        this->comp[0] -= _x.comp[0];
-        this->comp[1] -= _x.comp[1];
-        this->comp[2] -= _x.comp[2];
-        return *this;
-    }
+  }
 };
 
-inline vec operator*(double _a, const vec &_x) { return (vec(_a * _x.comp[0], _a * _x.comp[1], _a * _x.comp[2])); }
+// Overload the * operator inline to allow scalar multiplication commutativity
+inline Vector3 operator*(double scaler, const Vector3 &v) { return (Vector3(scaler * v.x, scaler * v.y, scaler * v.z)); }
 
-// Define the format for printing vectors:
-inline std::ostream &operator<<(std::ostream &os, const vec &_x) {
-    os << ' ' << _x.comp[0] << ' ' << _x.comp[1] << ' ' << _x.comp[2] << ' ';
-    return os;
+// Overload the << operator to print vectors
+inline std::ostream &operator<<(std::ostream &os, const Vector3 &v) {
+  os << v.x << ' ' << v.y << ' ' << v.z << ' ';
+  return os;
 }
 
-/* Here we define the variables of the system which we
-   want to keep for each time within one structure. */
-
+// status of a single particle
 struct state {
-    vec x, v, a;
-    double m, t;
-
-    state() {
-        x = v = a = vec(0, 0, 0);
-        m = t = 0;
-    }
-
-    state(double _x, double _v, double _m) {
-        x = v = a = vec(0, 0, 0);
-        t = 0;
-        x.comp[0] = _x;
-        v.comp[1] = _v;
-        m = _m;
-    }
+  Vector3 pos, vel, acc;
+  double mass, time;
 };
+
+#endif
